@@ -7,7 +7,14 @@ rm /etc/nginx/conf.d/*
 env | grep SITE_ | while read entry
 do
 
-    ./setup.sh $entry
+    ./setup-site.sh $entry
+
+done
+
+env | grep REDIRECT_ | while read entry
+do
+
+    ./setup-redirect.sh $entry
 
 done
 
