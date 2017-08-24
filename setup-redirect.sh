@@ -11,10 +11,13 @@ echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, serve
 conf=/etc/nginx/conf.d/$site.conf
 
 echo server { > $conf
-echo "listen $port;" >> $conf
-echo "set \$endpoint $endpoint;" >> $conf
-cat site.conf >> $conf
+echo "  listen $port;" >> $conf
+echo "  location / {" >> $conf
+echo "    return 301 $endpoint;" >> $conf
+echo "  }" >> $conf
+echo "}" >> $conf
 
 echo "Config for $site"
 cat $conf
+
 
