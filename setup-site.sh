@@ -11,13 +11,27 @@ echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, serve
 conf=/etc/nginx/conf.d/$site.conf
 
 echo server { > $conf
+
+if [ -n "$servername" ]
+then
+    echo "  server_name $servername;" >> $conf
+fi
+
 echo "  listen $port;" >> $conf
 echo "  set \$endpoint $endpoint;" >> $conf
 echo "  location / {" >> $conf
 echo "    resolver 8.8.8.8;" >> $conf
-echo "    proxy_set_header X-Forwarded-For $remote_addr;" >> $conf
-echo "    proxy_set_header Host $http_host;" >> $conf
-echo "    proxy_pass $endpoint;" >> $conf
+
+if [ -f "/etc/nginx/$site.passwd" ]
+then
+    echo '    auth_basic "Restricted";' >> $conf
+    echo "    auth_basic_user_file /etc/nginx/$site.passwd;" >> $conf
+    echo '    proxy_set_header Authorization "";' >> $conf
+fi
+
+echo "    proxy_set_header X-Forwarded-For \$remote_addr;" >> $conf
+echo "    proxy_set_header Host \$http_host;" >> $conf
+echo "    proxy_pass \$endpoint;" >> $conf
 echo "  }" >> $conf
 echo "}" >> $conf
 
