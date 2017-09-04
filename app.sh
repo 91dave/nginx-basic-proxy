@@ -55,6 +55,8 @@ then
 	done
 
 else
+	cp json.conf /etc/nginx/conf.d
+    echo "Using text-only logging"
 	nginx -g 'daemon off;'
 fi
 
