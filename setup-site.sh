@@ -1,9 +1,12 @@
 #!/bin/sh
 
 site=$(echo $1 | cut -d= -f1 | cut -d_ -f2)
-endpoint=$(echo $1 | cut -d= -f2)
-port=$2
-servername=$3
+args=$(echo $@ | cut -d= -f2-)
+
+endpoint=$(echo $args | cut -d '|' -f1)
+port=$(echo $args | cut -d '|' -f2)
+servername=$(echo $args | cut -d '|' -f3)
+internal=$(echo $args | cut -d '|' -f4)
 
 echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, servername=$servername" 
 ([ -z "$site" ] || [ -z "$endpoint" ] || [ -z "$port" ]) && echo You must specify site, endpoint and port && exit
@@ -20,7 +23,6 @@ fi
 echo "  listen $port;" >> $conf
 echo "  set \$endpoint $endpoint;" >> $conf
 echo "  location / {" >> $conf
-echo "    resolver 8.8.8.8;" >> $conf
 
 if [ -f "/etc/nginx/$site.passwd" ]
 then
@@ -31,7 +33,15 @@ fi
 
 echo "    proxy_set_header X-Forwarded-For \$remote_addr;" >> $conf
 echo "    proxy_set_header Host \$http_host;" >> $conf
-echo "    proxy_pass \$endpoint;" >> $conf
+
+if [ "$internal" = "true" ]
+then
+    echo "    proxy_pass $endpoint;" >> $conf
+else
+    echo "    proxy_pass \$endpoint;" >> $conf
+    echo "    resolver 8.8.8.8;" >> $conf
+fi
+
 echo "  }" >> $conf
 echo "}" >> $conf
 
