@@ -3,6 +3,7 @@
 # Clear out sites in /etc/nginx/sites-enabled
 rm /etc/nginx/conf.d/*
 rm /etc/nginx/*.passwd
+cp /etc/nginx/custom.conf /etc/nginx/conf.d
 
 # Setup all sites passed to us via env vars
 
