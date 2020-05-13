@@ -7,6 +7,7 @@ endpoint=$(echo $args | cut -d '|' -f1)
 port=$(echo $args | cut -d '|' -f2)
 servername=$(echo $args | cut -d '|' -f3)
 internal=$(echo $args | cut -d '|' -f4)
+bodysize=$(echo $args | cut -d '|' -f5)
 
 echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, servername=$servername" 
 ([ -z "$site" ] || [ -z "$endpoint" ] || [ -z "$port" ]) && echo You must specify site, endpoint and port && exit
@@ -18,6 +19,11 @@ echo server { > $conf
 if [ -n "$servername" ]
 then
     echo "  server_name $servername;" >> $conf
+fi
+
+if [ -n "$bodysize" ]
+then
+    echo "  client_max_body_size $bodysize;" >> $conf
 fi
 
 echo "  listen $port;" >> $conf
