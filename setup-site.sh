@@ -14,12 +14,6 @@ echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, serve
 
 conf=/etc/nginx/conf.d/$site.conf
 
-# add default passwords
-if [ -f "/etc/nginx/all.passwd" ]
-then
-    cat /etc/nginx/all.passwd >> /etc/nginx/$site.passwd
-fi
-
 # Create nginx.conf for site
 echo server { > $conf
 

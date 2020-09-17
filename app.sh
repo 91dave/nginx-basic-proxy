@@ -5,8 +5,8 @@ rm /etc/nginx/conf.d/*
 rm /etc/nginx/*.passwd
 cp /etc/nginx/custom.conf /etc/nginx/conf.d
 
-# Setup all sites passed to us via env vars
 
+# add per-site passwords
 env | grep BASIC_ | while read entry
 do
     
@@ -17,6 +17,17 @@ do
 
 done
 
+# add default passwords
+env | grep BASICINC_ | while read entry
+do
+    
+    site=$(echo $entry | cut -d= -f1 | cut -d_ -f2)
+
+    cat /etc/nginx/all.passwd  >> /etc/nginx/$site.passwd
+
+done
+
+# Setup all sites and redirects passed to us via env vars
 
 env | grep SITE_ | while read entry
 do
