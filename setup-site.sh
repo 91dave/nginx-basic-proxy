@@ -3,28 +3,36 @@
 site=$(echo $1 | cut -d= -f1 | cut -d_ -f2)
 args=$(echo $@ | cut -d= -f2-)
 
-endpoint=$(echo $args | cut -d '|' -f1)
-port=$(echo $args | cut -d '|' -f2)
-servername=$(echo $args | cut -d '|' -f3)
-internal=$(echo $args | cut -d '|' -f4)
-bodysize=$(echo $args | cut -d '|' -f5)
+root=/etc/nginx/
+conf=$root/conf.d/$site.conf
 
-echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, servername=$servername" 
+echo $args | tr '|' '\n' > vars.$site.sh
+source vars.$site.sh
+rm vars.$site.sh
+
+[ -z "$echohost" ] && echohost="true"
+
+echo "Setting up new site with site=$site, endpoint=$endpoint, port=$port, host=$host, echohost=$echohost" 
 ([ -z "$site" ] || [ -z "$endpoint" ] || [ -z "$port" ]) && echo You must specify site, endpoint and port && exit
 
-conf=/etc/nginx/conf.d/$site.conf
+echo $auth_files | tr ',' '\n' | while read file
+do
+    [ -f "$root/$file.passwd" ] && cat $root/$file.passwd >> $root/$site.passwd
+done
+
 
 # Create nginx.conf for site
 echo server { > $conf
 
-if [ -n "$servername" ]
+
+if [ -n "$host" ]
 then
-    echo "  server_name $servername;" >> $conf
+    echo "  server_name $host;" >> $conf
 fi
 
-if [ -n "$bodysize" ]
+if [ -n "$max_request" ]
 then
-    echo "  client_max_body_size $bodysize;" >> $conf
+    echo "  client_max_body_size $max_request;" >> $conf
 fi
 
 echo "  listen $port;" >> $conf
@@ -39,7 +47,11 @@ then
 fi
 
 echo "    proxy_set_header X-Forwarded-For \$remote_addr;" >> $conf
-echo "    proxy_set_header Host \$http_host;" >> $conf
+
+if [ "$echohost" = "true" ]
+then
+    echo "    proxy_set_header Host \$http_host;" >> $conf
+fi
 
 if [ "$internal" = "true" ]
 then

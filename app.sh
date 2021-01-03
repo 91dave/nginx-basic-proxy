@@ -1,29 +1,19 @@
 #!/bin/sh
 
 # Clear out sites in /etc/nginx/sites-enabled
-rm /etc/nginx/conf.d/*
-rm /etc/nginx/*.passwd
-cp /etc/nginx/custom.conf /etc/nginx/conf.d
+rm /etc/nginx/conf.d/* >& /dev/null
+rm /etc/nginx/*.passwd >& /dev/null
+cp /etc/nginx/custom.conf /etc/nginx/conf.d >& /dev/null
 
 
-# add per-site passwords
+# Add Basic authentication lines to .passwd files
 env | grep BASIC_ | while read entry
 do
     
-    site=$(echo $entry | cut -d= -f1 | cut -d_ -f2)
+    file=$(echo $entry | cut -d= -f1 | cut -d_ -f2)
     basic=$(echo $entry | cut -d= -f2)
 
-    echo $basic >> /etc/nginx/$site.passwd
-
-done
-
-# add default passwords
-env | grep BASICINC_ | while read entry
-do
-    
-    site=$(echo $entry | cut -d= -f1 | cut -d_ -f2)
-
-    cat /etc/nginx/all.passwd  >> /etc/nginx/$site.passwd
+    echo $basic >> /etc/nginx/$file.passwd
 
 done
 
