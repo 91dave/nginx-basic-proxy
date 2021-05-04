@@ -1,4 +1,4 @@
-name: Deploy Website
+name: Build image and push to Docker Hub
 env:
   DOCKER_REGISTRY: 91dave
   DOCKER_IMAGE: nginx-basic-proxy
