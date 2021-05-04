@@ -30,7 +30,7 @@ jobs:
 
       # Push to Docker Hub
       - name: Push to Docker Hub
-        uses: weseek/ghaction-docker-tags-by-semver@v1
+        uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
         with:
           source: $DOCKER_IMAGE
           target: $DOCKER_REGISTRY/$DOCKER_IMAGE
