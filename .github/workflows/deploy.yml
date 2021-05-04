@@ -1,0 +1,46 @@
+name: Deploy Website
+env:
+  DOCKER_REGISTRY: 91dave
+  DOCKER_IMAGE: nginx-basic-proxy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build image and push to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      # Login to Docker Hub
+      - name: Login to docker.io registry
+        run: |
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      # Build Docker Image
+      - name: Build image
+        run: |
+          docker build -t $DOCKER_IMAGE .
+
+      # Push to Docker Hub
+      - name: Push to Docker Hub
+        uses: weseek/ghaction-docker-tags-by-semver@v1
+        with:
+          source: $DOCKER_IMAGE
+          target: $DOCKER_REGISTRY/$DOCKER_IMAGE
+          semver: '2.0.0'
+          publish: true
+
+      # Update Description from Readme
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: $DOCKER_REGISTRY/$DOCKER_IMAGE
