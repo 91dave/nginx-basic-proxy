@@ -15,27 +15,25 @@ Find this on:
 
 All configuration is via environment variables. Each env var starting `SITE_` will configure a new `.conf` file with an nginx `server{}` directive. You can configure any number of sites by defining multiple env vars with the `SITE_` prefix. This is best illustrated by a docker-compose.yml file:
 
-```yml
-nginx-basic-proxy:
-	image: 91dave/nginx-basic-proxy
-	ports:
-	- 80:80
-	- 8080:8080
-	environment:
-	- SITE_1frontend=endpoint=http://front-end/|port=80|internal=true
-	- SITE_2admin=endpoint=http://admin-area/|port=80|host=admin.example.org login.example.org|internal=true
-	- SITE_3elasticsearch=endpoint=http://elasticsearch-backend-elb.amazonaws.com|port=8080|host=elasticsearch.example.org|internal=false|max_request=20M
-	links:
-	- front-end:front-end
-	- admin-area:admin-area
-	
-front-end:
-	image: nginx:alpine
-	
-admin-area:
-	image: nginx:alpine
-```
-
+	nginx-basic-proxy:
+	  image: 91dave/nginx-basic-proxy
+	  ports:
+	    - 80:80
+	    - 8080:8080
+	  environment:
+	    - SITE_1frontend=endpoint=http://front-end/|port=80|internal=true
+	    - SITE_2admin=endpoint=http://admin-area/|port=80|host=admin.example.org login.example.org|internal=true
+	    - SITE_3elasticsearch=endpoint=http://elasticsearch-backend-elb.amazonaws.com|port=8080|host=elasticsearch.example.org|internal=false|max_request=20M
+	  links:
+	    - front-end:front-end
+	    - admin-area:admin-area
+		
+	front-end:
+	  image: nginx:alpine
+	  
+	admin-area:
+	  image: nginx:alpine
+  
 As you can see, every environment variable defining a site to be proxied is effectively a number of key/value pairs split by a `|` character. The available config variables are below, and are optional unless explicitly specified.
 
 * `endpoint` (required): Endpoint to `proxy_pass` requests to
@@ -69,7 +67,3 @@ If both of the following environment variables are set, `nginx-basic-proxy` will
 
 - `ES_LOG_URL=http://elastic-search-url`
 - `ES_LOG_INDEX=+accesslogs-%Y.%m`
-
-## Authentication for Sites
-
-For any site setup via a `SITE_` variable
