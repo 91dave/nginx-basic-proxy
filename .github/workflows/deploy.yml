@@ -32,8 +32,8 @@ jobs:
       - name: Push to Docker Hub
         uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
         with:
-          source: $DOCKER_IMAGE
-          target: $DOCKER_REGISTRY/$DOCKER_IMAGE
+          source: ${{ env.DOCKER_IMAGE }}
+          target: ${{ env.DOCKER_REGISTRY }}/${{ env. DOCKER_IMAGE }}
           semver: '2.0.0'
           publish: true
 
@@ -43,4 +43,4 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-          repository: $DOCKER_REGISTRY/$DOCKER_IMAGE
+          repository: ${{ env.DOCKER_REGISTRY}}/${{} env.DOCKER_IMAGE }}
