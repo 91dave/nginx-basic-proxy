@@ -42,6 +42,7 @@ As you can see, every environment variable defining a site to be proxied is effe
 * `internal`: If set to true, the endpoint being proxied is assumed to be internal (generally useful for exposing services on the same machine). If set to false (default value), then an explicit DNS resolver of `8.8.8.8` is used to resolve the `proxy_pass` endpoint (incase it's IP address changes, for example)
 * `max_request`: If set, the `client_max_body_size` directive is set to the value specified. Useful if the endpoint being proxied to accepts large payloads
 * `echohost`: If set to true, then `proxy_set_header Host \$http_host;` directive is added, which effectively passes the existing host header through to the backend server
+* `auth_files`: See the [authentication](#basic-authentication) section below for further details
 
 In this example, we have configured:
 
@@ -67,3 +68,28 @@ If both of the following environment variables are set, `nginx-basic-proxy` will
 
 - `ES_LOG_URL=http://elastic-search-url`
 - `ES_LOG_INDEX=+accesslogs-%Y.%m`
+
+## BASIC Authentication
+
+It is possible to configure [BASIC authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) to secure any site (although be aware of the [limitations](https://security.stackexchange.com/a/990)).
+
+This is done by specifying the `auth_files` key/value pair within a `SITE_` variable. This should be a comma-separated list of `.passwd` files found in the `/etc/nginx/` folder. E.g. `auth_files=admin,user` will consolidate the following files into a single file for use by the current site:
+
+* `/etc/nginx/admin.passwd`
+* `/etc/nginx/user.passwd`
+
+The best way to provide those files is by mounting them as individual volumes within `/etc/nginx`, or better yet use Docker's in-built secrets mechanism (beyond the scope of this document).
+
+Alternatively, you can specify individual `user:passwd` combinations as environment variables using the `BASIC_` prefix. These envvars should be of the form `BASIC_{auth_file_name}_{unique_tag}={user}:{base_64_password}`, as shown below.
+
+	nginx-basic-proxy:
+	  image: 91dave/nginx-basic-proxy
+	  ports:
+	    - 80:80
+	    - 8080:8080
+	  environment:
+	    - SITE_1frontend=endpoint=http://front-end/|port=80|internal=true|auth_files=admin,user
+		- BASIC_admin_1=root:$$apr1$$abcdefgabcdefg
+		- BASIC_admin_2=administrator:$$apr1$$abcdefgabcdefg
+		- BASIC_user_1=user_name:$$apr1$$abcdefgabcdefg
+		- BASIC_user_2=my_login:$$apr1$$abcdefgabcdefg
