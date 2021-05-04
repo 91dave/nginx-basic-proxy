@@ -1,4 +1,4 @@
-name: Build image and push to Docker Hub
+name: Update README on Docker Hub
 env:
   DOCKER_REGISTRY: 91dave
   DOCKER_IMAGE: nginx-basic-proxy
@@ -8,13 +8,12 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
+    paths:
       - 'README.md'
-      - '.github/workflows/*'
 
 jobs:
   deploy:
-    name: Build image and push to Docker Hub
+    name: Update README on Docker Hub
     runs-on: ubuntu-latest
     steps:
       # Checkout repository
@@ -26,16 +25,10 @@ jobs:
         run: |
           echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      # Build Docker Image
-      - name: Build image
-        run: |
-          docker build -t $DOCKER_IMAGE .
-
-      # Push to Docker Hub
-      - name: Push to Docker Hub
-        uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
+      # Update Description from Readme
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
         with:
-          source: ${{ env.DOCKER_IMAGE }}
-          target: ${{ env.DOCKER_REGISTRY }}/${{ env. DOCKER_IMAGE }}
-          semver: '2.0.0'
-          publish: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: ${{ env.DOCKER_REGISTRY}}/${{ env.DOCKER_IMAGE }}
