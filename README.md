@@ -1,8 +1,14 @@
 # Introduction
 
+`nginx-basic-proxy` is an nginx-based reverse-proxy, run in Docker and configured entirely via Environment Variables.
+
 The use-case for this Docker image is configuring Nginx as a reverse proxy for a range of backend services via `docker-compose` without needing to touch the filesystem. If you need more complexe configuration options, extend this `Dockerfile` and add your custom options into `/etc/nginx/custom.conf`.
 
-If this doesn't suit your needs, take a look at https://github.com/jwilder/nginx-proxy, which is an excellent reverse-proxy for docker services.
+If this doesn't suit your needs, take a look at [`jwilder/nginx-proxy`](https://github.com/jwilder/nginx-proxy), which is an excellent reverse-proxy for docker services.
+
+Find this on:
+- [GitHub](https://github.com/91dave/nginx-basic-proxy)
+- [Docker Hub](https://hub.docker.com/r/91dave/nginx-basic-proxy)
 
 
 # Configuration
